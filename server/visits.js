@@ -10,6 +10,8 @@ const pool = configured
       database: process.env.DB_NAME,
       user: process.env.DB_USERNAME ?? process.env.DB_USER,
       password: process.env.DB_PASSWORD,
+      // managed pg requires TLS; DB_SSL=off opts out for local setups
+      ssl: process.env.DB_SSL === 'off' ? false : { rejectUnauthorized: false },
       max: 3,
       connectionTimeoutMillis: 5000,
     })

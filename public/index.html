@@ -232,14 +232,12 @@
     render(previewOffset);
   });
 
-  // real visitor counter (postgres via api), fake-but-committed fallback
+  // real visitor counter (postgres via api); visibly broken beats fake
   fetch('api/visit')
     .then(r => r.json())
-    .then(d => { if (!d.ok) throw new Error(d.reason); return d.total; })
-    .catch(() => 1337420 + epochDay() % 10000)
-    .then(count => {
-      document.getElementById('counter').textContent = String(count).padStart(7, '0');
-    });
+    .then(d => { if (!d.ok) throw new Error(d.reason); return String(d.total).padStart(7, '0'); })
+    .catch(err => { console.warn('counter offline:', err.message); return '???????'; })
+    .then(text => { document.getElementById('counter').textContent = text; });
 
   // ambient sparkles
   const GLYPHS = ['✨', '⭐', '🌟', '✦', '˖'];
