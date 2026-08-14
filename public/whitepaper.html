@@ -92,30 +92,29 @@
 
   <div class="card">
     <h2>the architecture</h2>
-    <div class="diagram">
- ┌─────────────┐  cron 0 0 * * *  ┌──────────────────────┐
- │  edge job    │ ───────────────▶ │  POST /api/trigger    │
- │ (app.yaml)   │   + X-Api-Key    │  (express, node.js)   │
- └─────────────┘                  └──────────┬───────────┘
-                                             │ in-process
-                                             ▼
-                                  ┌──────────────────────┐
-                                  │  openai agents sdk    │
-                                  │  scout (web search)   │
-                                  │  + gpt-image-1 render │
-                                  └──────────┬───────────┘
-                                             │ writes png + manifest
-                                             ▼
- ┌─────────────┐   serves live    ┌──────────────────────┐
- │   browser    │ ◀─────────────── │  volume /data/…       │
- │  (sparkles)  │                  │  (s3-backed, mounted) │
- └──────┬──────┘                  └──────────────────────┘
-        │ /api/visit  /api/seen/:id  /api/fame
-        ▼
- ┌─────────────┐
- │  postgres    │  visits + blessing_views
- │ (managed)    │
- └─────────────┘</div>
+    <div class="diagram">┌──────────────┐   cron 0 0 * * *    ┌───────────────────────┐
+│   edge job   │ ────── api key ──▶  │  POST /api/trigger    │
+│  (app.yaml)  │                     │  express (node.js)    │
+└──────────────┘                     └───────────┬───────────┘
+                                                 │ in-process
+                                                 ▼
+                                     ┌───────────────────────┐
+                                     │  openai agents sdk    │
+                                     │  scout: web search    │
+                                     │  gpt-image-1 render   │
+                                     └───────────┬───────────┘
+                                                 │ png + manifest
+                                                 ▼
+┌──────────────┐                     ┌───────────────────────┐
+│   browser    │ ◀─── serves live ── │  volume /data/…       │
+│  (sparkles)  │                     │  s3-backed, mounted   │
+└──────┬───────┘                     └───────────────────────┘
+       │  /api/visit   /api/seen/:id   /api/fame
+       ▼
+┌──────────────┐
+│   postgres   │  visits + blessing_views
+│  (managed)   │
+└──────────────┘</div>
   </div>
 
   <div class="card">
@@ -221,6 +220,10 @@ git push   <span class="c"># …and this is the deploy now. secrets apply on the
     <p>Or skip the typing entirely: the full source lives at
     <a href="https://github.com/baalimago/motivational-racoon-and-friends">github.com/baalimago/motivational-racoon-and-friends</a>
     — fork it, swap the animals, ship ur own blessings.</p>
+    <p>Even lazier: feed ur coding agent the machine-readable version of this
+    whole guide, hosted right here as an agent skill:
+    <a href="skill.md">trash.delivery/skill.md</a>. It contains every gotcha we
+    hit so ur agent doesn't have to.</p>
   </div>
 
   <div class="center" style="margin-top:30px;">

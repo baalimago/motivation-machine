@@ -8,15 +8,16 @@
 
 *one blessing per day. as nature intended. no rats.*
 
-[![build: blessed](https://img.shields.io/badge/build-blessed-ff69b4?style=for-the-badge)](https://motivational-racoon-and-friends.wasmer.app)
+[![build: blessed](https://img.shields.io/badge/build-blessed-ff69b4?style=for-the-badge)](https://trash.delivery)
 [![rats: 0](https://img.shields.io/badge/rats-0-success?style=for-the-badge)](#code-of-conduct)
 [![vibes: immaculate](https://img.shields.io/badge/vibes-immaculate-blueviolet?style=for-the-badge)](#)
 [![uptime of spirit: 99.9%](https://img.shields.io/badge/uptime_of_spirit-99.9%25-yellow?style=for-the-badge)](#)
 [![powered by: audacity](https://img.shields.io/badge/powered_by-breadcrumbs_%26_audacity-orange?style=for-the-badge)](#)
 [![PRs: blessed](https://img.shields.io/badge/PRs-blessed-brightgreen?style=for-the-badge)](#-contributing)
 
-**[🦝 LIVE DEMO 🦝](https://motivational-racoon-and-friends.wasmer.app)** •
-**[📜 whitepage](https://motivational-racoon-and-friends.wasmer.app/whitepaper.html)** •
+**[🦝 LIVE AT TRASH.DELIVERY 🦝](https://trash.delivery)** •
+**[📜 whitepage](https://trash.delivery/whitepaper.html)** •
+**[🤖 agent skill](https://trash.delivery/skill.md)** •
 **[⭐ smash that star button](#-star-history)** •
 **[💬 join our discord²](#)**
 
