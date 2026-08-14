@@ -40,7 +40,7 @@ const MOODS = [
   "feral",
   "delusionally-confident",
   "cozy-apocalyptic",
-  "wistful",
+  "passive-aggressively-zen",
   "menacingly-supportive",
   "victorious-against-nothing",
 ];
@@ -102,14 +102,28 @@ meme per day featuring a trash animal (raccoon, possum, guinea pig, seagull, etc
 STRICTLY NO RATS.
 
 Search the web for a fresh motivational/demotivational trash-animal meme in the
-early-2000s glitter-WordArt style (like "the horrors persist but so do i" or
-"there is no trash cannot, there is only trash CAN"). Avoid captions already in
-this list of used captions (provided in the prompt).
+early-2000s glitter-WordArt style. Avoid captions already in the used list
+(provided in the prompt). If you find a great existing one, report it with its
+source_url. If nothing good turns up, INVENT one: pick an animal from
+${ALLOWED_ANIMALS.join(", ")} and write a caption.
 
-If you find a great existing one, report it with its source_url.
-If nothing good turns up, INVENT one: pick an animal from ${ALLOWED_ANIMALS.join(", ")},
-write a caption that is sincere, slightly unhinged, lowercase, and either
-weirdly encouraging or devastatingly honest. Describe a photo scene for it.`,
+THE CAPTION MUST BE A JOKE FIRST. It has to land a punchline — the reader
+should exhale through their nose. The mood seed colors the joke; it never
+replaces it. Use one of these comedy mechanisms:
+- subvert a motivational-poster cliché ("just because you don't give up
+  doesn't mean you will make it")
+- pun or wordplay ("there is no trash cannot, there is only trash CAN")
+- fake precision ("i am 97% audacity, 3% fries, and still undefeated")
+- absurdly specific imagery ("i manifest abundance by yelling at the ocean
+  until it gives me fries")
+- unearned confidence about something pathetic ("i'm not totally useless!
+  i can be used as a bad example")
+
+NEVER write poetic melancholy or pretty sadness. Bad example (do not do
+this): "i visit the old dumpster to see if hope left a note for me" — that
+is a poem, not a joke. If the caption would fit in a sad indie film, throw
+it away and write one that would fit on a crooked office poster instead.
+Keep it lowercase, sincere, slightly unhinged. Describe a photo scene for it.`,
 });
 
 async function readJson(file, fallback) {
