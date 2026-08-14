@@ -1,0 +1,27 @@
+kind: wasmer.io/App.v0
+name: motivational-racoon-and-friends
+package: .
+
+capabilities:
+  database:
+    engine: postgres
+
+# Agent-produced blessings land here (no redeploy needed).
+# The Node server serves this dir at /blessings/*.
+volumes:
+  - name: blessings
+    mount: /data/blessings
+
+# Daily trash blessing at midnight UTC: the endpoint runs the OpenAI agent
+# in-process and writes the result to the blessings volume.
+# Requires secrets: OPENAI_API_KEY (and optionally TRIGGER_TOKEN).
+jobs:
+  - name: daily-trash-blessing
+    trigger: "0 0 * * *"
+    action:
+      fetch:
+        path: /api/trigger-blessing
+        method: POST
+        timeout: 5m
+        expect:
+          status_codes: [200, 204]

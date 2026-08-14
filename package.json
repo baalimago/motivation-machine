@@ -1,0 +1,23 @@
+{
+  "name": "motivational-racoon-and-friends",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "One (de)motivational trash animal per day. No rats.",
+  "scripts": {
+    "dev": "node server/index.js",
+    "start": "node server/index.js",
+    "agent": "node agent/daily-agent.js",
+    "migrate": "make migrate-db-remote"
+  },
+  "dependencies": {
+    "@openai/agents": "^0.1.0",
+    "express": "^5.1.0",
+    "openai": "^5.0.0",
+    "pg": "^8.13.0",
+    "zod": "^3.23.8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "racoons": [
+    {
+      "id": "horrors-persist",
+      "image": "racoons/horrors-persist.jpg",
+      "caption": "the horrors persist, but so do I",
+      "animal": "guinea pig",
+      "mood": "unbothered"
+    },
+    {
+      "id": "bad-example",
+      "image": "racoons/bad-example.jpg",
+      "caption": "i'm not totally useless! i can be used as a bad example",
+      "animal": "possum",
+      "mood": "aspirational"
+    },
+    {
+      "id": "trash-can",
+      "image": "racoons/trash-can.jpg",
+      "caption": "there is no trash cannot, there is only trash CAN!",
+      "animal": "racoon",
+      "mood": "motivational"
+    },
+    {
+      "id": "wont-make-it",
+      "image": "racoons/wont-make-it.jpg",
+      "caption": "just because you don't give up doesn't mean you will make it",
+      "animal": "racoon",
+      "mood": "demotivational"
+    }
+  ]
+}
