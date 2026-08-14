@@ -94,8 +94,8 @@
   <div class="card">
     <h2>the architecture</h2>
     <div class="diagram">┌──────────────┐   cron 0 0 * * *    ┌───────────────────────┐
-│   edge job   │ ────── api key ──▶  │  POST /api/trigger    │
-│  (app.yaml)  │                     │  express (node.js)    │
+│  cron job    │ ────── api key ──▶  │  POST /api/trigger    │
+│ (API-sourced)│                     │  express (node.js)    │
 └──────────────┘                     └───────────┬───────────┘
                                                  │ in-process
                                                  ▼
@@ -133,8 +133,9 @@
   </div>
 
   <div class="card">
-    <h2>step 2: app.yaml — database, volume, cron job</h2>
-    <p>Three platform capabilities carry the whole design:</p>
+    <h2>step 2: app.yaml — database &amp; volume</h2>
+    <p>Two platform capabilities carry the design (the cron job is deliberately
+    <b>not</b> in here — see step 5):</p>
     <pre>kind: wasmer.io/App.v0
 name: ur-blessing-machine
 package: .
@@ -145,16 +146,7 @@ capabilities:
 
 volumes:
   - name: blessings
-    mount: /data/blessings   <span class="c"># s3-backed, survives deploys, shared rw</span>
-
-jobs:
-  - name: daily-blessing
-    trigger: '0 0 * * *'
-    action:
-      fetch:
-        path: /api/trigger-blessing
-        method: POST
-        timeout: 5m</pre>
+    mount: /data/blessings   <span class="c"># s3-backed, survives deploys, shared rw</span></pre>
     <p>The volume is the trick: the agent writes images + a JSON manifest there, the
     server serves it statically, and the frontend merges it with the seed manifest —
     so new content appears <b>without redeploying</b>.</p>
@@ -193,11 +185,18 @@ jobs:
   </div>
 
   <div class="card">
-    <h2>step 5: secrets &amp; auth</h2>
+    <h2>step 5: secrets, auth &amp; the cron job</h2>
     <p>API keys live in app secrets (<code>wasmer app secret create OPENAI_API_KEY …</code>),
     injected as env vars on deploy. The trigger endpoint fails closed: no
     <code>TRIGGER_TOKEN</code> configured → 503; wrong <code>X-Api-Key</code> → 401.
     Only the cron job (and u) can summon new blessings.</p>
+    <p>Here's the subtle part: cron jobs have a <b>source</b>. Jobs defined in
+    app.yaml are <i>config-sourced</i> — their headers live in the repo (token
+    leak, if ur repo is public like ours) and the API refuses to edit them.
+    So the daily job is created as an <i>API-sourced</i> job instead — via the
+    dashboard's Jobs page or the (undocumented) <code>createCronJob</code>
+    GraphQL mutation — with the <code>X-Api-Key</code> header attached there.
+    Token stays out of git, job stays editable, midnight stays blessed.</p>
   </div>
 
   <div class="card">
@@ -207,6 +206,26 @@ jobs:
     consecutive days don't walk the list in order). Deep links are plain URL hashes
     (<code>#some-blessing-id</code>), and the hall of fame ranks every blessing ever by
     adoration count from <code>/api/fame</code>. Also: sparkle cursor trail. Non-negotiable.</p>
+  </div>
+
+  <div class="card">
+    <h2>🤖 give this 2 ur agent</h2>
+    <p>You don't have to build any of this by hand. This entire guide exists as a
+    <b>self-contained agent skill</b> — complete working code for every file,
+    the full deployment sequence, and every gotcha we hit so ur agent doesn't
+    have to. Paste this to your coding agent (Claude Code, Codex, whatever):</p>
+    <pre>Read https://trash.delivery/skill.md and follow it. Build me a daily
+AI-generated site about &lt;YOUR THEME HERE&gt;. Go.</pre>
+    <p>The agent picks a name, writes the code, deploys, sets secrets, migrates
+    the database, and verifies the whole loop end to end. That claim is not
+    hypothetical: this very site was built exactly that way — the skill is the
+    distilled transcript of an agent doing it, mistakes removed.</p>
+    <p><b>Do NOT paste ur API keys into the chat.</b> The skill instructs the
+    agent to refuse them and walk u through the safe way instead:
+    <code>wasmer login</code> in ur own terminal (the agent never sees the
+    token) and keys as env vars the agent references but never reads. Chat
+    logs live forever. Treat them like the dumpster: assume everything in
+    there will be found by a raccoon eventually.</p>
   </div>
 
   <div class="card">
@@ -221,10 +240,6 @@ git push   <span class="c"># …and this is the deploy now. secrets apply on the
     <p>Or skip the typing entirely: the full source lives at
     <a href="https://github.com/baalimago/motivational-racoon-and-friends">github.com/baalimago/motivational-racoon-and-friends</a>
     — fork it, swap the animals, ship ur own blessings.</p>
-    <p>Even lazier: feed ur coding agent the machine-readable version of this
-    whole guide, hosted right here as an agent skill:
-    <a href="skill.md">trash.delivery/skill.md</a>. It contains every gotcha we
-    hit so ur agent doesn't have to.</p>
   </div>
 
   <div class="center" style="margin-top:30px;">

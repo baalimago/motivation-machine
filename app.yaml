@@ -1,4 +1,4 @@
-name: motivational-raccoon-and-friends
+name: motivation-machine
 app_id: da_nP7IptBU9BLO
 owner: baalimago
 package: .
@@ -8,18 +8,11 @@ capabilities:
 volumes:
 - name: blessings
   mount: /data/blessings
-jobs:
-- name: daily-trash-blessing
-  trigger: 0 0 * * *
-  action:
-    fetch:
-      path: /api/trigger-blessing
-      method: POST
-      timeout: 5m
-      expect:
-        status_codes:
-        - 200
-        - 204
+# NOTE: the daily job is deliberately NOT defined here. Config-sourced jobs
+# can't carry the auth header without committing the token to the repo, and
+# they can't be edited via API/GUI. The job lives as an API-sourced cronjob
+# ("daily-trash-blessing-authed", created via the createCronJob GraphQL
+# mutation) with the X-Api-Key header attached. See whitepaper/skill.md.
 kind: wasmer.io/App.v0
 annotations:
   anybuild.run/config:
