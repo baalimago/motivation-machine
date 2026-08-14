@@ -69,7 +69,7 @@
 - 📦 **Zero-redeploy CMS** — an S3-backed volume mounted into the served directory; the agent writes, the site updates, nobody deploys
 - 👑 **Adoration-ranked hall of fame** — every blessing ever, democratically sorted by clicks
 - 🔗 **Deep links** — `#i-am-held-together` is a valid URL fragment and honestly a valid life philosophy
-- 🔐 **Enterprise security** — the generation endpoint fails closed behind an API key, because the only thing worse than no possum is unauthorized possum
+- 🔐 **Security by nonexistence** — there is no generation endpoint. The cronjob runs the agent directly on edge. You cannot hack what does not exist. We call this "zero trust", possibly incorrectly
 
 ## 🏗️ architecture
 
@@ -77,8 +77,7 @@
 
 ```mermaid
 flowchart TD
-    CRON[edge job<br>0 0 * * * + X-Api-Key] -->|POST /api/trigger-blessing| SRV[express on wasmer edge]
-    SRV -->|in-process| AGENT[openai agents sdk scout<br>web search → find or invent]
+    CRON[execute cronjob<br>0 0 * * * — runs ON edge] -->|cli_args: agent/run.js| AGENT[openai agents sdk scout<br>web search → find or invent]
     AGENT -->|caption + scene| IMG[gpt-image-1<br>glitter wordart renderer]
     IMG -->|png + manifest| VOL[(volume /data/blessings<br>s3-backed, survives everything)]
     VOL -->|served live, no redeploy| WEB[browser + sparkle cursor trail]
@@ -102,7 +101,6 @@ Ship it:
 ```bash
 wasmer deploy --build-remote   # first deploy; then connect the repo to wasmer
 wasmer app secret create OPENAI_API_KEY sk-...
-wasmer app secret create TRIGGER_TOKEN $(openssl rand -hex 24)
 make migrate-db-remote DATABASE_URL=postgres://...   # PGSSLMODE=require, ask us how we know
 git push   # this IS the deploy. we do gitops here. the raccoon reviews nothing
 ```

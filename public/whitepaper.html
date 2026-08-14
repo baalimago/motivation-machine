@@ -94,14 +94,9 @@
   <div class="card">
     <h2>the architecture</h2>
     <div class="diagram">┌──────────────┐   cron 0 0 * * *    ┌───────────────────────┐
-│  cron job    │ ────── api key ──▶  │  POST /api/trigger    │
-│ (API-sourced)│                     │  express (node.js)    │
-└──────────────┘                     └───────────┬───────────┘
-                                                 │ in-process
-                                                 ▼
-                                     ┌───────────────────────┐
-                                     │  openai agents sdk    │
-                                     │  scout: web search    │
+│ execute cron │ ── cli_args ──────▶ │  agent runs ON EDGE   │
+│  (app.yaml)  │                     │  openai agents sdk    │
+└──────────────┘                     │  scout: web search    │
                                      │  gpt-image-1 render   │
                                      └───────────┬───────────┘
                                                  │ png + manifest
@@ -127,15 +122,16 @@
   "scripts": { "start": "node server/index.js" },
   "dependencies": { "express": "^5", "pg": "^8", "@openai/agents": "^0.1" }
 }</pre>
-    <p>Connect the GitHub repo to the app once, and from then on
-    <b><code>git push</code> is the deploy</b> — Wasmer builds remotely on every push.
-    (A manual <code>wasmer deploy --build-remote</code> works too, for the impatient.)</p>
+    <p>Deploy with <code>wasmer deploy --build-remote</code>. Once the repo is
+    linked to the app (import at <a href="https://wasmer.io/new">wasmer.io/new</a>
+    or connect it in the dashboard), <b><code>git push</code> becomes the
+    deploy</b> — Wasmer builds remotely on every push.</p>
   </div>
 
   <div class="card">
     <h2>step 2: app.yaml — database &amp; volume</h2>
-    <p>Two platform capabilities carry the design (the cron job is deliberately
-    <b>not</b> in here — see step 5):</p>
+    <p>Two platform capabilities carry the design (plus the daily execute job,
+    shown in step 5 — it's safe in here because it contains no secrets):</p>
     <pre>kind: wasmer.io/App.v0
 name: ur-blessing-machine
 package: .
@@ -179,24 +175,37 @@ volumes:
   outputType: MemeConcept,   <span class="c">// zod: animal, caption, mood, …</span>
   instructions: 'STRICTLY NO RATS…',
 });</pre>
-    <p>The daily edge job just <code>fetch</code>es an endpoint; the express server runs
-    the agent <b>in-process</b> and writes straight to the mounted volume. No CI, no
-    external cron, no relay.</p>
+    <p>The daily execute job runs the agent's entry script <b>directly on Edge</b>
+    and writes straight to the mounted volume. No CI, no external cron, no relay,
+    no endpoint.</p>
   </div>
 
   <div class="card">
-    <h2>step 5: secrets, auth &amp; the cron job</h2>
+    <h2>step 5: secrets &amp; the cron job</h2>
     <p>API keys live in app secrets (<code>wasmer app secret create OPENAI_API_KEY …</code>),
-    injected as env vars on deploy. The trigger endpoint fails closed: no
-    <code>TRIGGER_TOKEN</code> configured → 503; wrong <code>X-Api-Key</code> → 401.
-    Only the cron job (and u) can summon new blessings.</p>
-    <p>Here's the subtle part: cron jobs have a <b>source</b>. Jobs defined in
-    app.yaml are <i>config-sourced</i> — their headers live in the repo (token
-    leak, if ur repo is public like ours) and the API refuses to edit them.
-    So the daily job is created as an <i>API-sourced</i> job instead — via the
-    dashboard's Jobs page or the (undocumented) <code>createCronJob</code>
-    GraphQL mutation — with the <code>X-Api-Key</code> header attached there.
-    Token stays out of git, job stays editable, midnight stays blessed.</p>
+    injected as env vars on deploy. And here's the beautiful part: the daily
+    job is an <b>execute cronjob</b> — it doesn't call an HTTP endpoint, it
+    starts an instance of the app package <i>on Edge</i> and runs the agent
+    script directly:</p>
+    <pre>jobs:
+  - name: daily-blessing
+    trigger: '0 0 * * *'
+    action:
+      execute:
+        command: start          <span class="c"># the workload's edgejs command…</span>
+        cli_args:
+          - agent/run.js        <span class="c"># …running the agent instead of the server</span></pre>
+    <p>The exec instance gets the volume mounted <b>and every app secret as an
+    env var</b> (we checked). So there is no trigger endpoint, no auth token,
+    no header to protect — an earlier version of this site had a whole
+    token-authed <code>POST /api/trigger-blessing</code> apparatus, and we
+    deleted all of it. U cannot hack an endpoint that does not exist.</p>
+    <p>Fine print: jobs (like secrets) only propagate on the <i>next deploy</i>;
+    and the yaml <code>timeout</code> is currently ignored for config execute
+    jobs (u get 180s — a generation run takes ~2min, so it fits, barely).
+    Every run's status + full logs are queryable via the
+    <code>CronJob.invocations</code> GraphQL field, which is how we verified
+    all of this.</p>
   </div>
 
   <div class="card">
@@ -232,11 +241,15 @@ AI-generated site about &lt;YOUR THEME HERE&gt;. Go.</pre>
     <h2>recap: ur own machine in 6 commands</h2>
     <pre>npm init -y && npm i express pg @openai/agents zod
 <span class="c"># write server/, agent/, public/, app.yaml (see above)</span>
-wasmer deploy --build-remote   <span class="c"># first deploy; then connect the repo…</span>
+wasmer deploy --build-remote
 wasmer app secret create OPENAI_API_KEY sk-…
-wasmer app secret create TRIGGER_TOKEN $(openssl rand -hex 24)
 PGSSLMODE=require psql … -f migrations.sql
-git push   <span class="c"># …and this is the deploy now. secrets apply on the next one</span></pre>
+wasmer deploy --build-remote   <span class="c"># again — secrets &amp; jobs apply on redeploy</span></pre>
+    <p><b>Or deploy with git:</b> link the repo to the app first — import it at
+    <a href="https://wasmer.io/new">wasmer.io/new</a>, or connect it from the app
+    dashboard — and from then on every <code>git push</code> builds and deploys
+    automatically. (A <code>git push</code> without the link does nothing to ur
+    app. Ask us how we know.)</p>
     <p>Or skip the typing entirely: the full source lives at
     <a href="https://github.com/baalimago/motivational-racoon-and-friends">github.com/baalimago/motivational-racoon-and-friends</a>
     — fork it, swap the animals, ship ur own blessings.</p>
