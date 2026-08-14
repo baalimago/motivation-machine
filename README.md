@@ -171,8 +171,8 @@ We tried explaining ingress controllers to the possum. It played dead. We respec
 <details>
 <summary><b>raccoon or racoon?</b></summary>
 
-We spent real engineering hours on this migration. Two c's. There is a legacy-key
-compatibility shim in production because of it. This is the most honest sentence in this README.
+We spent real engineering hours on this migration. Two c's. There is a legacy-key compatibility
+shim in production because of it. This is the most honest sentence in this README.
 
 </details>
 
