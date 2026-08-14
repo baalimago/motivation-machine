@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📜 the whitepage ☆ how 2 build ur own trash blessing machine</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: "Comic Sans MS", "Comic Neue", cursive;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.55), transparent 45%),
+      radial-gradient(ellipse at 85% 25%, rgba(255,255,255,.45), transparent 40%),
+      linear-gradient(160deg, #7ec8f7 0%, #a3d8ff 22%, #ffc7ec 48%, #d8b6ff 72%, #9ad6ff 100%);
+    background-attachment: fixed;
+    color: #4b2a6b;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><text y="18" font-size="16">📜</text></svg>'), auto;
+  }
+  .page { max-width: 780px; margin: 0 auto; padding: 24px 16px 80px; }
+  h1 {
+    text-align: center;
+    font-size: clamp(26px, 6vw, 48px);
+    font-weight: 900;
+    background: linear-gradient(180deg, #fff95e 0%, #ff9a3d 30%, #ff44a8 60%, #b03dff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(2px 2px 0 #6b1fa8) drop-shadow(4px 4px 0 rgba(255,255,255,.85));
+    transform: rotate(-1.5deg);
+  }
+  .subtitle { text-align: center; font-style: italic; color: #8a2ea0; text-shadow: 1px 1px 0 #fff; margin-bottom: 26px; }
+  h2 {
+    font-size: 24px; font-weight: 900; margin: 36px 0 10px;
+    background: linear-gradient(180deg, #b3ffb3 0%, #2ecc40 40%, #0099ff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(1px 1px 0 #0b5e8a) drop-shadow(2px 2px 0 rgba(255,255,255,.9));
+    transform: rotate(-.5deg);
+  }
+  p, li { line-height: 1.55; text-shadow: 1px 1px 0 rgba(255,255,255,.7); }
+  .card {
+    background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,238,249,.92));
+    border: 4px ridge #ffd700;
+    border-radius: 10px;
+    box-shadow: 0 0 0 3px #ff8ad4, 6px 6px 0 rgba(107,31,168,.3);
+    padding: 4px 18px 14px;
+    margin: 14px 0;
+  }
+  pre {
+    background: #1b0b2e; color: #7dff8a;
+    font-family: "Courier New", monospace; font-size: 13px;
+    border: 3px outset #888; border-radius: 6px;
+    padding: 12px; overflow-x: auto;
+    text-shadow: none;
+  }
+  pre .c { color: #9a7fc4; }
+  code { background: #fff; border: 1px solid #ff8ad4; border-radius: 4px; padding: 0 4px; font-size: 13px; }
+  .diagram {
+    font-family: "Courier New", monospace; font-size: 13px; font-weight: bold;
+    background: #1b0b2e; color: #ffd1f7; border: 3px outset #888; border-radius: 6px;
+    padding: 14px; overflow-x: auto; white-space: pre; text-align: center; text-shadow: none;
+  }
+  .home { display: inline-block; font-weight: bold; color: #fff; text-decoration: none;
+    background: linear-gradient(180deg, #ff8ad4, #d5008f); border: 4px outset #ffb6e6;
+    border-radius: 12px; padding: 8px 18px; text-shadow: 1px 1px 0 #8a005c;
+    box-shadow: 4px 4px 0 rgba(107,31,168,.4); }
+  .center { text-align: center; }
+  .construction { font-weight: bold; background: repeating-linear-gradient(45deg, #ffd700 0 10px, #111 10px 20px);
+    color: #fff; text-shadow: 1px 1px 2px #000; padding: 3px 10px; display: inline-block;
+    transform: rotate(-1deg); border: 2px solid #111; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="center">
+    <a class="home" href="./">⌂ back 2 the blessings</a>
+    <a class="home" href="https://github.com/baalimago/motivational-racoon-and-friends">🐙 steal the code on github</a>
+  </div>
+
+  <h1>📜 the whitepage</h1>
+  <div class="subtitle">~ a technical guide 2 building ur own daily inspirational quotes machine on wasmer edge ~</div>
+
+  <div class="card">
+    <h2>what even is this</h2>
+    <p>
+      A fully autonomous (de)motivational meme website. Once per day, an AI agent finds
+      or invents a new trash-animal blessing, renders it in early-2000s glitter WordArt,
+      and publishes it — with <b>zero redeploys</b> and <b>zero humans involved</b>.
+      Visitors and per-blessing adoration are counted in a real Postgres database.
+      The whole thing is one npm project on
+      <a href="https://wasmer.io">Wasmer Edge</a>.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>the architecture</h2>
+    <div class="diagram">
+ ┌─────────────┐  cron 0 0 * * *  ┌──────────────────────┐
+ │  edge job    │ ───────────────▶ │  POST /api/trigger    │
+ │ (app.yaml)   │   + X-Api-Key    │  (express, node.js)   │
+ └─────────────┘                  └──────────┬───────────┘
+                                             │ in-process
+                                             ▼
+                                  ┌──────────────────────┐
+                                  │  openai agents sdk    │
+                                  │  scout (web search)   │
+                                  │  + gpt-image-1 render │
+                                  └──────────┬───────────┘
+                                             │ writes png + manifest
+                                             ▼
+ ┌─────────────┐   serves live    ┌──────────────────────┐
+ │   browser    │ ◀─────────────── │  volume /data/…       │
+ │  (sparkles)  │                  │  (s3-backed, mounted) │
+ └──────┬──────┘                  └──────────────────────┘
+        │ /api/visit  /api/seen/:id  /api/fame
+        ▼
+ ┌─────────────┐
+ │  postgres    │  visits + blessing_views
+ │ (managed)    │
+ └─────────────┘</div>
+  </div>
+
+  <div class="card">
+    <h2>step 1: one npm project, no dockerfile</h2>
+    <p>Wasmer Edge auto-detects Node projects. A plain <code>package.json</code> with a
+    <code>start</code> script that binds <code>process.env.PORT</code> is the entire contract:</p>
+    <pre>{
+  "type": "module",
+  "scripts": { "start": "node server/index.js" },
+  "dependencies": { "express": "^5", "pg": "^8", "@openai/agents": "^0.1" }
+}</pre>
+    <p>Connect the GitHub repo to the app once, and from then on
+    <b><code>git push</code> is the deploy</b> — Wasmer builds remotely on every push.
+    (A manual <code>wasmer deploy --build-remote</code> works too, for the impatient.)</p>
+  </div>
+
+  <div class="card">
+    <h2>step 2: app.yaml — database, volume, cron job</h2>
+    <p>Three platform capabilities carry the whole design:</p>
+    <pre>kind: wasmer.io/App.v0
+name: ur-blessing-machine
+package: .
+
+capabilities:
+  database:
+    engine: postgres    <span class="c"># managed pg, creds injected as DB_* env vars</span>
+
+volumes:
+  - name: blessings
+    mount: /data/blessings   <span class="c"># s3-backed, survives deploys, shared rw</span>
+
+jobs:
+  - name: daily-blessing
+    trigger: '0 0 * * *'
+    action:
+      fetch:
+        path: /api/trigger-blessing
+        method: POST
+        timeout: 5m</pre>
+    <p>The volume is the trick: the agent writes images + a JSON manifest there, the
+    server serves it statically, and the frontend merges it with the seed manifest —
+    so new content appears <b>without redeploying</b>.</p>
+  </div>
+
+  <div class="card">
+    <h2>step 3: postgres (mind the TLS!)</h2>
+    <p>The managed database injects <code>DB_HOST</code>, <code>DB_PORT</code>,
+    <code>DB_NAME</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code>.
+    One gotcha that will eat ur afternoon: the server <b>requires TLS</b>, and
+    node-postgres doesn't enable it by default:</p>
+    <pre>new pg.Pool({ ..., ssl: { rejectUnauthorized: false } })</pre>
+    <p>Migrate from ur laptop by revealing the creds
+    (<code>wasmer app secret reveal DB_HOST</code> …) and running
+    <code>psql</code> with <code>PGSSLMODE=require</code>. This site's counter is two
+    tiny tables: <code>visits(day, total)</code> and <code>blessing_views(id, views)</code>,
+    upserted with <code>ON CONFLICT … DO UPDATE</code>.</p>
+  </div>
+
+  <div class="card">
+    <h2>step 4: the agent</h2>
+    <p>An <a href="https://developers.openai.com/api/docs/guides/agents">OpenAI Agents SDK</a>
+    scout with a web-search tool hunts for an existing meme; if the internet disappoints,
+    it invents a caption ("sincere, slightly unhinged, lowercase") and
+    <code>gpt-image-1</code> renders it with the text baked in, glitter and all.
+    Structured output via a zod schema keeps the result machine-usable:</p>
+    <pre>const scout = new Agent({
+  model: 'gpt-5',
+  tools: [webSearchTool()],
+  outputType: MemeConcept,   <span class="c">// zod: animal, caption, mood, …</span>
+  instructions: 'STRICTLY NO RATS…',
+});</pre>
+    <p>The daily edge job just <code>fetch</code>es an endpoint; the express server runs
+    the agent <b>in-process</b> and writes straight to the mounted volume. No CI, no
+    external cron, no relay.</p>
+  </div>
+
+  <div class="card">
+    <h2>step 5: secrets &amp; auth</h2>
+    <p>API keys live in app secrets (<code>wasmer app secret create OPENAI_API_KEY …</code>),
+    injected as env vars on deploy. The trigger endpoint fails closed: no
+    <code>TRIGGER_TOKEN</code> configured → 503; wrong <code>X-Api-Key</code> → 401.
+    Only the cron job (and u) can summon new blessings.</p>
+  </div>
+
+  <div class="card">
+    <h2>step 6: the frontend</h2>
+    <p>Zero-build vanilla HTML with a deterministic daily pick — everyone sees the same
+    blessing all day (<code>epochDay × 2654435761 mod n</code>, a golden-ratio hash so
+    consecutive days don't walk the list in order). Deep links are plain URL hashes
+    (<code>#some-blessing-id</code>), and the hall of fame ranks every blessing ever by
+    adoration count from <code>/api/fame</code>. Also: sparkle cursor trail. Non-negotiable.</p>
+  </div>
+
+  <div class="card">
+    <h2>recap: ur own machine in 6 commands</h2>
+    <pre>npm init -y && npm i express pg @openai/agents zod
+<span class="c"># write server/, agent/, public/, app.yaml (see above)</span>
+wasmer deploy --build-remote   <span class="c"># first deploy; then connect the repo…</span>
+wasmer app secret create OPENAI_API_KEY sk-…
+wasmer app secret create TRIGGER_TOKEN $(openssl rand -hex 24)
+PGSSLMODE=require psql … -f migrations.sql
+git push   <span class="c"># …and this is the deploy now. secrets apply on the next one</span></pre>
+    <p>Or skip the typing entirely: the full source lives at
+    <a href="https://github.com/baalimago/motivational-racoon-and-friends">github.com/baalimago/motivational-racoon-and-friends</a>
+    — fork it, swap the animals, ship ur own blessings.</p>
+  </div>
+
+  <div class="center" style="margin-top:30px;">
+    <span class="construction">🚧 THIS WHITEPAGE IS PEER-REVIEWED BY RACCOONS 🚧</span><br><br>
+    <a class="home" href="./">⌂ back 2 the blessings</a>
+  </div>
+</div>
+</body>
+</html>

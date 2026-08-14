@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>☆ Daily Trash Blessing ☆ ur (de)motivational racoon of the day ☆</title>
+<title>☆ Daily Trash Blessing ☆ ur (de)motivational raccoon of the day ☆</title>
 <style>
   @font-face { font-family: fallbackcomic; src: local("Comic Sans MS"); }
 
@@ -91,6 +91,7 @@
     box-shadow: 3px 3px 0 rgba(107,31,168,.35);
     margin-bottom: 20px;
   }
+  .daybadge a { color: #d5008f; }
 
   .frame {
     display: inline-block;
@@ -143,9 +144,10 @@
   }
 
   .footer { margin-top: 14px; font-size: 13px; color: #6b3fa0; text-shadow: 1px 1px 0 #fff; }
-  .footer .construction { font-weight: bold; color: #cc0000; background: repeating-linear-gradient(45deg, #ffd700 0 10px, #111 10px 20px); color: #fff; text-shadow: 1px 1px 2px #000; padding: 3px 10px; display: inline-block; transform: rotate(-1deg); border: 2px solid #111; }
+  .footer .construction { font-weight: bold; background: repeating-linear-gradient(45deg, #ffd700 0 10px, #111 10px 20px); color: #fff; text-shadow: 1px 1px 2px #000; padding: 3px 10px; display: inline-block; transform: rotate(-1deg); border: 2px solid #111; }
 
-  button.another {
+  button.chunky, a.chunky {
+    display: inline-block;
     font-family: inherit;
     font-size: 16px;
     font-weight: bold;
@@ -154,82 +156,194 @@
     border: 4px outset #ffb6e6;
     border-radius: 12px;
     padding: 10px 22px;
-    margin-top: 18px;
+    margin: 18px 4px 0;
     cursor: pointer;
+    text-decoration: none;
     text-shadow: 1px 1px 0 #8a005c;
     box-shadow: 4px 4px 0 rgba(107,31,168,.4);
   }
-  button.another:active { border-style: inset; transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(107,31,168,.4); }
+  button.chunky:active, a.chunky:active { border-style: inset; transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(107,31,168,.4); }
+  .chunky.blue { background: linear-gradient(180deg, #7ec8f7, #1d6fd0); border-color: #b3e0ff; text-shadow: 1px 1px 0 #0d4a91; }
+
+  /* ~ hall of trash fame ~ */
+  h2.gallery-title {
+    font-size: clamp(22px, 5vw, 38px);
+    font-weight: 900;
+    margin: 34px auto 14px;
+    background: linear-gradient(180deg, #b3ffb3 0%, #2ecc40 40%, #0099ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(2px 2px 0 #0b5e8a) drop-shadow(3px 3px 0 rgba(255,255,255,.9));
+    transform: rotate(1deg);
+  }
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .polaroid {
+    background: linear-gradient(180deg, #fff, #ffeef9);
+    border: 3px ridge #ffd700;
+    padding: 8px 8px 6px;
+    width: 150px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 rgba(107,31,168,.3);
+    transition: transform .15s;
+    text-decoration: none;
+    color: #4b2a6b;
+  }
+  .polaroid:nth-child(odd)  { transform: rotate(-2.5deg); }
+  .polaroid:nth-child(even) { transform: rotate(2deg); }
+  .polaroid:hover { transform: rotate(0deg) scale(1.12); box-shadow: 0 0 18px #ff8ad4, 6px 6px 0 rgba(107,31,168,.3); z-index: 3; position: relative; }
+  .polaroid img { width: 100%; height: 110px; object-fit: cover; border: 2px solid #eee; display: block; }
+  .polaroid .plabel { font-size: 11px; padding-top: 5px; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .polaroid .pviews { font-family: "Courier New", monospace; font-size: 11px; font-weight: bold; color: #d5008f; padding-top: 3px; }
+  .polaroid.current { outline: 4px dashed #ff2d95; outline-offset: 3px; }
 </style>
 </head>
 <body>
 <marquee class="topbar" scrollamount="6">
-  ☆゚.*・。゚ WELCOME 2 UR DAILY TRASH BLESSING ゚。・*.゚☆ &nbsp; one (de)motivational racoon per day, as nature intended &nbsp; ☆゚.*・。゚ no rats allowed ゚。・*.゚☆
+  ☆゚.*・。゚ WELCOME 2 UR DAILY TRASH BLESSING ゚。・*.゚☆ &nbsp; one (de)motivational raccoon per day, as nature intended &nbsp; ☆゚.*・。゚ no rats allowed ゚。・*.゚☆
 </marquee>
 
 <div class="page">
   <h1 class="wordart">Daily Trash Blessing</h1>
-  <div class="subtitle">~ ur (de)motivational racoon of the day ~</div>
+  <div class="subtitle">~ ur (de)motivational raccoon of the day ~</div>
   <div><span class="daybadge" id="daybadge">loading the day…</span></div>
 
   <div class="frame">
-    <img id="racoon-img" src="" alt="today's motivational trash animal">
+    <img id="raccoon-img" src="" alt="today's motivational trash animal">
   </div>
 
-  <div class="caption" id="racoon-caption">summoning today's creature…</div>
-  <div class="meta" id="racoon-meta"></div>
+  <div class="caption" id="raccoon-caption">summoning today's creature…</div>
+  <div class="meta" id="raccoon-meta"></div>
 
-  <button class="another" id="another">🗑️ bless me again (preview 2morrow)</button>
+  <div>
+    <button class="chunky" id="another">🗑️ bless me again (preview 2morrow)</button>
+    <button class="chunky blue" id="permalink">🔗 copy link 2 this blessing</button>
+  </div>
+
+  <h2 class="gallery-title">☆ hall of trash fame ☆</h2>
+  <div class="meta">~ every blessing ever, ranked by adoration ~</div>
+  <div class="gallery" id="gallery"></div>
 
   <div class="divider">✧･ﾟ: *✧･ﾟ:* 🦝 *:･ﾟ✧*:･ﾟ✧</div>
-  <div>u are visitor № <span class="counter" id="counter">0000000</span></div>
+  <div>u are visitor № <span class="counter" id="counter">·······</span></div>
   <div class="footer">
     <span class="construction">🚧 UNDER CONSTRUCTION 4EVER 🚧</span><br><br>
     best viewed in 800×600 &nbsp;•&nbsp; powered by wasmer edge &nbsp;•&nbsp; new trash daily at midnight UTC<br>
-    © whenever. the racoons own the rights.
+    <a href="whitepaper.html" style="color:#d5008f; font-weight:bold;">📜 the whitepage: how 2 build ur own trash blessing machine</a><br>
+    © whenever. the raccoons own the rights.
   </div>
 </div>
 
 <script>
-  // deterministic day pick: same racoon for everyone all day
   const DAY_MS = 86400000;
   const epochDay = (offset = 0) => Math.floor(Date.now() / DAY_MS) + offset;
 
   let manifest = [];
   let previewOffset = 0;
+  let currentId = null;
+  let fame = {};
 
-  function pick(offset) {
-    const day = epochDay(offset);
-    // small mixing so consecutive days don't just walk the array in order
-    const idx = ((day * 2654435761) >>> 0) % manifest.length;
+  // deterministic day pick: same raccoon for everyone all day
+  function dailyPick(offset) {
+    const idx = ((epochDay(offset) * 2654435761) >>> 0) % manifest.length;
     return manifest[idx];
   }
 
-  function render(offset) {
-    const r = pick(offset);
-    document.getElementById('racoon-img').src = r.image;
-    document.getElementById('racoon-caption').textContent = '“' + r.caption + '”';
-    document.getElementById('racoon-meta').textContent =
-      'species: ' + r.animal + ' ✦ vibe: ' + r.mood + (offset ? ' ✦ (preview of +' + offset + ' day' + (offset > 1 ? 's' : '') + ')' : '');
+  function show(entry, { badge } = {}) {
+    currentId = entry.id;
+    document.getElementById('raccoon-img').src = entry.image;
+    document.getElementById('raccoon-caption').textContent = '“' + entry.caption + '”';
+    document.getElementById('raccoon-meta').textContent =
+      'species: ' + entry.animal + ' ✦ vibe: ' + entry.mood + (entry.added ? ' ✦ blessed ' + entry.added : '')
+      + ' ✦ 👀 ' + (fame[entry.id] ?? 0) + ' adorations';
+    document.getElementById('daybadge').innerHTML = badge;
+    document.querySelectorAll('.polaroid').forEach(p =>
+      p.classList.toggle('current', p.dataset.id === entry.id));
+    // count the adoration (fire-and-forget; refresh ranking when it lands)
+    fetch('api/seen/' + entry.id, { method: 'POST' })
+      .then(r => r.json())
+      .then(d => { if (d.ok) { fame[entry.id] = d.views; buildGallery(); } })
+      .catch(() => {});
+  }
+
+  function showDaily(offset = 0) {
     const d = new Date(Date.now() + offset * DAY_MS);
-    document.getElementById('daybadge').textContent =
-      '☀ ' + d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + ' ☀';
+    const nice = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    history.replaceState(null, '', location.pathname);
+    show(dailyPick(offset), {
+      badge: '☀ ' + nice + (offset ? ' (preview +' + offset + ')' : '') + ' ☀',
+    });
+  }
+
+  function showById(id) {
+    const entry = manifest.find(r => r.id === id);
+    if (!entry) return showDaily();
+    history.replaceState(null, '', '#' + id);
+    show(entry, { badge: '★ archival blessing ★ <a href="#" id="back2today">⌂ back 2 today</a>' });
+    document.getElementById('back2today')?.addEventListener('click', e => {
+      e.preventDefault();
+      previewOffset = 0;
+      showDaily();
+    });
+  }
+
+  // every blessing is always shown; adoration only decides the pecking order
+  function buildGallery() {
+    const g = document.getElementById('gallery');
+    g.innerHTML = '';
+    const newest = [...manifest].reverse();
+    newest
+      .sort((a, b) => (fame[b.id] ?? 0) - (fame[a.id] ?? 0))
+      .forEach((entry, rank) => {
+        const a = document.createElement('a');
+        a.className = 'polaroid';
+        a.href = '#' + entry.id;
+        a.dataset.id = entry.id;
+        const crown = rank === 0 && (fame[entry.id] ?? 0) > 0 ? '👑 ' : '';
+        a.innerHTML = '<img loading="lazy" src="' + entry.image + '" alt="">'
+          + '<div class="plabel">' + crown + entry.caption + '</div>'
+          + '<div class="pviews">👀 ' + (fame[entry.id] ?? 0) + '</div>';
+        a.classList.toggle('current', entry.id === currentId);
+        g.appendChild(a);
+      });
   }
 
   // seed manifest ships with the app; agent additions live on the mounted
-  // volume at /blessings/blessings.json and appear without a redeploy
+  // volume at /blessings/blessings.json and appear without a redeploy.
+  // (accept the legacy misspelled key from older volume manifests)
+  const entriesOf = d => d.raccoons ?? d.racoons ?? [];
   Promise.all([
-    fetch('racoons.json').then(r => r.json()),
-    fetch('blessings/blessings.json').then(r => r.ok ? r.json() : { racoons: [] }).catch(() => ({ racoons: [] })),
+    fetch('raccoons.json').then(r => r.json()),
+    fetch('blessings/blessings.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+    fetch('api/fame').then(r => r.json()).then(d => { fame = d.fame ?? {}; }).catch(() => {}),
   ]).then(([seed, extra]) => {
     const seen = new Set();
-    manifest = [...seed.racoons, ...extra.racoons].filter(r => !seen.has(r.id) && seen.add(r.id));
-    render(0);
+    manifest = [...entriesOf(seed), ...entriesOf(extra)].filter(r => !seen.has(r.id) && seen.add(r.id));
+    buildGallery();
+    location.hash.length > 1 ? showById(location.hash.slice(1)) : showDaily();
+  });
+
+  addEventListener('hashchange', () => {
+    location.hash.length > 1 ? showById(location.hash.slice(1)) : showDaily();
   });
 
   document.getElementById('another').addEventListener('click', () => {
     previewOffset = (previewOffset + 1) % 14;
-    render(previewOffset);
+    showDaily(previewOffset);
+  });
+
+  document.getElementById('permalink').addEventListener('click', e => {
+    const url = location.origin + location.pathname + (currentId ? '#' + currentId : '');
+    navigator.clipboard?.writeText(url);
+    e.target.textContent = '✅ copied!! share the blessing';
+    setTimeout(() => { e.target.textContent = '🔗 copy link 2 this blessing'; }, 1600);
   });
 
   // real visitor counter (postgres via api); visibly broken beats fake

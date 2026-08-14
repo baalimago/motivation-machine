@@ -1,4 +1,4 @@
-APP           ?= motivational-racoon-and-friends
+APP           ?= baalimago/motivational-raccoon-and-friends
 VOLUME        ?= blessings
 BLESSINGS_DIR ?= agent/staging
 
@@ -32,7 +32,7 @@ bless:
 
 # Push locally produced blessings to the app's volume (served at /blessings/*).
 # One-time setup: wasmer app volumes credentials $(APP) --format=rclone
-# and add the printed remote as [racoon-vol] in ~/.config/rclone/rclone.conf
+# and add the printed remote as [raccoon-vol] in ~/.config/rclone/rclone.conf
 publish-blessings:
-	rclone copy $(BLESSINGS_DIR) racoon-vol:$(VOLUME)/ --progress
+	rclone copy $(BLESSINGS_DIR) raccoon-vol:$(VOLUME)/ --progress
 	@echo "blessings published 🦝"

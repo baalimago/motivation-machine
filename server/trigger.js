@@ -6,7 +6,12 @@ let running = false;
 // the blessings volume so it is served immediately.
 export async function triggerHandler(req, res) {
   const token = process.env.TRIGGER_TOKEN;
-  if (token && req.get('authorization') !== `Bearer ${token}`) {
+  if (!token) {
+    return res.status(503).json({ ok: false, reason: 'TRIGGER_TOKEN not configured' });
+  }
+  const authorized =
+    req.get('authorization') === `Bearer ${token}` || req.get('x-api-key') === token;
+  if (!authorized) {
     return res.status(401).json({ ok: false, reason: 'bad token' });
   }
   if (!process.env.OPENAI_API_KEY) {

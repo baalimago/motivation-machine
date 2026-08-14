@@ -15,11 +15,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SEED_MANIFEST = path.join(ROOT, 'public', 'racoons.json');
+const SEED_MANIFEST = path.join(ROOT, 'public', 'raccoons.json');
 const BLESSINGS_DIR = process.env.BLESSINGS_DIR ?? '/data/blessings';
 
 const ALLOWED_ANIMALS = [
-  'racoon', 'possum', 'opossum', 'trash panda', 'badger', 'skunk',
+  'raccoon', 'possum', 'opossum', 'trash panda', 'badger', 'skunk',
   'seagull', 'pigeon', 'guinea pig', 'ferret',
 ];
 
@@ -38,7 +38,7 @@ const scout = new Agent({
   tools: [webSearchTool()],
   outputType: MemeConcept,
   instructions: `You curate a "daily trash blessing" website: one (de)motivational
-meme per day featuring a trash animal (racoon, possum, guinea pig, seagull, etc).
+meme per day featuring a trash animal (raccoon, possum, guinea pig, seagull, etc).
 STRICTLY NO RATS.
 
 Search the web for a fresh motivational/demotivational trash-animal meme in the
@@ -59,10 +59,11 @@ async function readJson(file, fallback) {
 export async function runDailyBlessing() {
   if (!process.env.OPENAI_API_KEY) throw new Error('OPENAI_API_KEY not set');
 
-  const seed = await readJson(SEED_MANIFEST, { racoons: [] });
+  const entriesOf = d => d.raccoons ?? d.racoons ?? []; // legacy misspelled key
+  const seed = await readJson(SEED_MANIFEST, {});
   const manifestPath = path.join(BLESSINGS_DIR, 'blessings.json');
-  const blessings = await readJson(manifestPath, { racoons: [] });
-  const used = [...seed.racoons, ...blessings.racoons].map(r => r.caption);
+  const blessings = { raccoons: entriesOf(await readJson(manifestPath, {})) };
+  const used = [...entriesOf(seed), ...blessings.raccoons].map(r => r.caption);
 
   const result = await run(
     scout,
@@ -99,7 +100,7 @@ spelled exactly as given.`,
     source: concept.found_existing ? concept.source_url : 'generated',
     added: new Date().toISOString().slice(0, 10),
   };
-  blessings.racoons.push(entry);
+  blessings.raccoons.push(entry);
   await writeFile(manifestPath, JSON.stringify(blessings, null, 2) + '\n');
   console.log(`blessed: ${file} — "${concept.caption}"`);
   return entry;
