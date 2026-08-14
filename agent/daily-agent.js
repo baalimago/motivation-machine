@@ -23,12 +23,48 @@ const ALLOWED_ANIMALS = [
   'seagull', 'pigeon', 'guinea pig', 'ferret',
 ];
 
+// randomized creative seeds, injected per-run so consecutive days diverge
+const MOODS = [
+  'motivational', 'demotivational', 'unbothered', 'aspirational', 'feral',
+  'delusionally-confident', 'cozy-apocalyptic', 'wistful', 'menacingly-supportive',
+  'victorious-against-nothing',
+];
+const STYLES = [
+  'deep-fried jpeg meme format, artifacts and all',
+  'gritty flash-photo at night, direct harsh flash',
+  'low-poly early-3D render like a PS1 cutscene',
+  'dreamy vaporwave sunset double-exposure over a landscape',
+  'pink Barbie-cam aesthetic with glitter lens flares',
+  'scanned 2000s PowerPoint slide with clip-art energy',
+  'soft-focus inspirational office poster, airbrushed',
+  'grainy VHS still with tracking lines',
+];
+const PLACEMENTS = [
+  'text arched across the top',
+  'text stacked in the bottom-left corner',
+  'text split between top and bottom like a classic meme',
+  'text running diagonally across the middle',
+  'each word in a different place around the subject',
+  'text crammed small in one corner like an afterthought',
+];
+const DECOR = [
+  'scattered pixel hearts',
+  'glitter star stickers in the corners',
+  'sparkle lens flares everywhere',
+  'a single rainbow arcing through',
+  'no stickers or decorations at all, just the photo and text',
+  'tiny comic-sans doodles in the margins',
+];
+
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const pickN = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+
 const MemeConcept = z.object({
   found_existing: z.boolean().describe('true if a real existing meme was found on the web'),
   source_url: z.string().nullable().describe('URL of the found meme, null if invented'),
   animal: z.string().describe('the trash animal featured. NEVER a rat.'),
   caption: z.string().describe('the (de)motivational text, lowercase, sincere-but-unhinged'),
-  mood: z.enum(['motivational', 'demotivational', 'unbothered', 'aspirational', 'feral']),
+  mood: z.enum(MOODS),
   image_description: z.string().describe('scene description for image generation if invented'),
 });
 
@@ -65,9 +101,22 @@ export async function runDailyBlessing() {
   const blessings = { raccoons: entriesOf(await readJson(manifestPath, {})) };
   const used = [...entriesOf(seed), ...blessings.raccoons].map(r => r.caption);
 
+  const recentAnimals = [...blessings.raccoons].slice(-5).map(r => r.animal);
+  const creative = {
+    mood: pick(MOODS),
+    animals: pickN(ALLOWED_ANIMALS.filter(a => !recentAnimals.includes(a)), 3),
+  };
+
   const result = await run(
     scout,
-    `Find or invent today's trash blessing. Already-used captions:\n- ${used.join('\n- ')}`,
+    `Find or invent today's trash blessing.
+
+Today's creative seed (lean into it, unless the muse strikes otherwise):
+- mood: ${creative.mood}
+- candidate animals: ${creative.animals.join(', ')}
+- recently featured (do NOT repeat these): ${recentAnimals.join(', ') || 'none yet'}
+
+Already-used captions:\n- ${used.join('\n- ')}`,
   );
   const concept = result.finalOutput;
   console.log('concept:', concept);
@@ -76,15 +125,21 @@ export async function runDailyBlessing() {
     .toLowerCase().replace(/[^a-z0-9 ]/g, '').trim()
     .split(/\s+/).slice(0, 4).join('-');
 
+  const style = pick(STYLES);
+  const placement = pick(PLACEMENTS);
+  const decor = pick(DECOR);
+  console.log('image seed:', { style, placement, decor });
+
   const openai = new OpenAI();
   const img = await openai.images.generate({
     model: 'gpt-image-1',
     size: '1024x1024',
-    prompt: `A meme in authentic early-2000s PowerPoint / glitter-graphics style:
-a photo of a ${concept.animal} (${concept.image_description}), with the text
-"${concept.caption}" overlaid in sparkly rainbow WordArt with drop shadows,
-slightly deep-fried jpeg quality, sincere and unhinged. The text must be
-spelled exactly as given.`,
+    prompt: `An early-2000s internet meme. Visual style: ${style}.
+A ${concept.animal} (${concept.image_description}).
+The text "${concept.caption}" overlaid in glittery WordArt with drop shadows,
+${placement}. Decoration: ${decor}.
+Sincere and unhinged. The text must be spelled exactly as given, and must be
+fully readable and uncropped.`,
   });
 
   const file = `${id}.png`;
